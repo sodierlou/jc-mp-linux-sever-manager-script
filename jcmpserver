@@ -1,0 +1,19 @@
+#!/bin/bash
+# Just Cause 2 Multiplayer
+# Server Management Script
+# Author: Mauro ( sodierlou )
+# Website: http://rghdcom.it
+# Version: 01
+
+#--- VARIABILI
+
+# Dettagli Server
+gamename="Just Cause 2 Multiplayer"
+servicename="Jcmp-Server"
+
+# Steam login
+steamuser="anonymous"
+steampass=""
+
+# Steam Appid
+appid="261140"
