@@ -71,6 +71,7 @@ sleep 1
 echo ""
 }
 
+## Installazione del server
 fn_steaminstall(){
 echo "Installazione ${gamename} Server"
 echo "================================="
@@ -91,6 +92,7 @@ done
 echo ""
 }
 
+## Riprova l'installazione
 fn_retryinstall(){
 while true; do
 	read -p "Riprovare l'installazione? [y/N]" yn
@@ -102,4 +104,20 @@ while true; do
 done
 }
 
+## Comando installa
+fn_install(){
+	fn_rootcheck # controllo utente
+	fn_steamdl # installazione SteamCMD
+	fn_steaminstall # installazione Server
+}
 
+
+
+case "$1" in
+	install)
+		fn_install;;
+	*)
+	echo "Usare: $0 {install}"
+	exit 1;;
+esac
+exit
