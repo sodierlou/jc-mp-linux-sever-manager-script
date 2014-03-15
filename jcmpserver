@@ -17,3 +17,34 @@ steampass=""
 
 # Steam Appid
 appid="261140"
+
+# Direttive
+rootdir="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd )"
+selfname="$0"
+filesdir="${rootdir}/serverfiles"
+systemdir="${filesdir}"
+executabledir="${filesdir}"
+executable="./Jcmp-Server"
+servercfgdir="${filesdir}"
+servercfg="config.lua"
+servercfgfullpath="${servercfgdir}/${servercfg}"
+defaultcfg="${servercfgdir}/default-config.lua"
+backupdir="backups"
+steamclient="${rootdir}/steamcmd/linux32/steamclient.so"
+
+
+
+
+#--- SCRIPT
+# Non modificare
+# a meno che tu non sappia
+# quello che fai
+
+
+## Controllo Utente
+fn_rootcheck(){
+if [ `whoami` = "root" ];then
+	echo -e "[\e[0;31m FAIL \e[0;39m] Script will not run as root!"
+	exit
+fi
+}
