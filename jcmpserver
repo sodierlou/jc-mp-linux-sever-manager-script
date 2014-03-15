@@ -91,3 +91,15 @@ done
 echo ""
 }
 
+fn_retryinstall(){
+while true; do
+	read -p "Riprovare l'installazione? [y/N]" yn
+	case $yn in
+	[Yy]* ) fn_install;;
+	[Nn]* ) echo Exiting; exit;;
+	* ) echo "Rispondere yes o no.";;
+	esac
+done
+}
+
+
