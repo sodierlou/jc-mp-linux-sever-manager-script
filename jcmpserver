@@ -32,7 +32,18 @@ defaultcfg="${servercfgdir}/default-config.lua"
 backupdir="backups"
 steamclient="${rootdir}/steamcmd/linux32/steamclient.so"
 
+# Logging
+logdays="7"
+gamelogdir="${systemdir}/logs"
+scriptlogdir="${rootdir}/log/script"
+consolelogdir="${rootdir}/log/console"
 
+scriptlog="${scriptlogdir}/${servicename}-script.log"
+consolelog="${consolelogdir}/${servicename}-console.log"
+emaillog="${scriptlogdir}/${servicename}-email.log"
+
+scriptlogdate="${scriptlogdir}/${servicename}-script-$(date '+%d-%m-%Y-%H-%M-%S').log"
+consolelogdate="${consolelogdir}/${servicename}-console-$(date '+%d-%m-%Y-%H-%M-%S').log"
 
 
 #--- SCRIPT
@@ -108,6 +119,24 @@ done
 echo ""
 }
 
+fn_loginstall(){
+echo "Creazione cartelle LOG"
+echo "================================="
+sleep 1
+mkdir -pv "${rootdir}/log"
+mkdir -pv "${scriptlogdir}"
+touch "${scriptlog}"
+mkdir -pv "${consolelogdir}"
+touch "${consolelog}"
+if [ ! -h ${rootdir}/log/server ]; then
+	ln -sv "${gamelogdir}" "${rootdir}/log/server"
+else
+	echo "Symbolic link ${gamelogdir} => ${rootdir}/log/server already exists!"
+fi
+sleep 1
+echo ""
+}
+
 ## Riprova l'installazione
 fn_retryinstall(){
 while true; do
@@ -118,14 +147,6 @@ while true; do
 	* ) echo "Rispondere yes o no.";;
 	esac
 done
-}
-
-## Comando installa
-fn_install(){
-	fn_rootcheck # controllo Utente
-	fn_steamdl # installazione SteamCMD
-	fn_steaminstall # installazione Server
-	fn_createconfig # configurazione del Server
 }
 
 ## Configurazione del server
@@ -202,11 +223,76 @@ echo "================================="
 	echo ""
 }
 
+
+## Comando installa
+fn_install(){
+	fn_rootcheck # controllo Utente
+	fn_steamdl # installazione SteamCMD
+	fn_steaminstall # installazione Server
+	fn_createconfig # configurazione del Server
+	fn_loginstall # crazione cartelle LOG
+}
+
+fn_startserver(){
+fn_rootcheck
+tmuxwc=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -v failed|grep -E "^${servicename}:"|wc -l)
+if [ ${tmuxwc} -eq 0 ]; then
+	#mv "${scriptlog}" "${scriptlogdate}"
+	#mv "${consolelog}" "${consolelogdate}"
+	echo "a"
+fi
+echo  "Starting ${servicename}: ${servername}"
+sleep 1
+#fn_scriptlog "Starting ${servername}"
+if [ ${tmuxwc} -eq 1 ]; then
+	echo  "Starting ${servicename}: ${servername} is already running"
+	sleep 1
+	echo -en "\n"
+	#fn_scriptlog "${servername} is already running"
+	exit
+fi
+cd "${executabledir}"
+tmux new-session -d -s ${servicename} "${executable} ${parms}|tee -a '${consolelog}'"
+sleep 1
+tmuxwc=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -E "^${servicename}:"|wc -l)
+if [ ${tmuxwc} -eq 0 ]; then
+	echo  "Starting ${servicename}: Failed to start ${servername}"
+	#fn_scriptlog "failed to start ${servername}"
+else
+	echo  "Starting ${servicename}: ${servername}"
+	#fn_scriptlog "Started ${servername}"
+fi
+sleep 1
+echo -en "\n"
+}
+
+fn_stopserver(){
+fn_rootcheck
+pid=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -E "^${servicename}:"|wc -l)
+echo "Stopping ${servicename}: ${servername}"
+sleep 1
+#fn_scriptlog "Stopping ${servername}"
+if [ "${pid}" == "0" ]; then
+	echo "Stopping ${servicename}: ${servername} is already stopped"
+	#fn_scriptlog "${servername} is already stopped"
+else
+	tmux kill-session -t ${servicename}
+	echo  "Stopping ${servicename}: ${servername}"
+	#fn_scriptlog "Stopped ${servername}"
+fi
+sleep 1
+echo -en "\n"
+}
+
 case "$1" in
+	start)
+		fn_startserver;;
+	stop)
+		fn_stopserver;;
 	install)
 		fn_install;;
 	*)
-	echo "Usare: $0 {install}"
+	echo "Usare: $0 {start|stop|install}"
 	exit 1;;
 esac
 exit
