@@ -202,9 +202,6 @@ echo "================================="
 	echo ""
 }
 
-}
-
-
 case "$1" in
 	install)
 		fn_install;;
