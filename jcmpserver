@@ -237,8 +237,8 @@ fn_startserver(){
 fn_rootcheck
 tmuxwc=$(tmux list-sessions 2>&1|awk '{print $1}'|grep -v failed|grep -E "^${servicename}:"|wc -l)
 if [ ${tmuxwc} -eq 0 ]; then
-	#mv "${scriptlog}" "${scriptlogdate}"
-	#mv "${consolelog}" "${consolelogdate}"
+	mv "${scriptlog}" "${scriptlogdate}"
+	mv "${consolelog}" "${consolelogdate}"
 fi
 echo  "Starting ${servicename}: ${servername}"
 sleep 1
