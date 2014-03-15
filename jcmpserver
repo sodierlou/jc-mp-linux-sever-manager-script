@@ -125,7 +125,7 @@ fn_install(){
 	fn_rootcheck # controllo Utente
 	fn_steamdl # installazione SteamCMD
 	fn_steaminstall # installazione Server
-	fn_createconfig() # configurazione del Server
+	fn_createconfig # configurazione del Server
 }
 
 ## Configurazione del server
